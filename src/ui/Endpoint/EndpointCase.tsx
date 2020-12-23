@@ -102,9 +102,10 @@ export function EndpointCase(props: EndpointCaseProps) {
 
 			{(codeStatus < 300 || codeStatus >= 400) && <RequestSection name="response">
 				<CodeHighlight value={``
-					+ '{\n'
-					+ `  "status": ${RPC_STATUS_TO_CODE[value.status]},\n`
-					+ `  "body": ${body}`
+					+ '{'
+					+ `\n  "status": "${value.status}"`
+					+ ((value.code) ? `,\n  "code": "${value.code}"` : ``)
+					+ ((value.body) ? `,\n  "body": ${body}` : ``)
 					+ `\n}`
 				}/>
 			</RequestSection>}
@@ -196,6 +197,11 @@ function renderJSONObject(ref: ReflectItemMap, raw: any, ind = '') {
 			val = JSON
 				.stringify(val, null, (nind + ind).length)
 				.replace(/\}$/, `${nind}}`)
+			;
+		} else if (isArray(val)) {
+			val = JSON
+				.stringify(val, null, (nind + ind).length)
+				.replace(/\]$/, `${nind}]`)
 			;
 		} else {
 			val = JSON.stringify(val);
@@ -310,15 +316,7 @@ function EndpointURL({entry, scheme, access}: EndpointURLProps) {
 
 	return(
 		<span>
-			{host}{entry.name}{' '}
-			<RequestFactory
-				access={access}
-				project={entry.scheme!.project}
-				detail={entry.scheme!.detail[scheme.status]!}
-				scheme={scheme}
-				host={activeHost}
-				url={entry.name}
-			/>
+			{host}{entry.name}
 		</span>
 	);
 }
@@ -450,6 +448,10 @@ function Description({value}: {value: string}) {
 
 function isObject(val: unknown): val is object {
 	return Object.prototype.toString.call(val) === '[object Object]'
+}
+
+function isArray(val: unknown): boolean {
+	return Object.prototype.toString.call(val) === '[object Array]'
 }
 
 function useConsoleLog(...args: any[]) {

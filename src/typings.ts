@@ -101,6 +101,7 @@ export type SchemeCase = {
 	description: string;
 	access: string;
 	status: string;
+	code: string;
 	method: string;
 	headers?: {
 		request: object;
